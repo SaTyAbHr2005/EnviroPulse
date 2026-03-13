@@ -1,14 +1,17 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, Map as MapIcon, PlayCircle, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Map as MapIcon, PlayCircle, ShieldAlert, Activity } from 'lucide-react';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const menuItems = [
-    { icon: <MapIcon size={18} />, label: 'Map View', path: '/' },
-    { icon: <ShieldAlert size={18} />, label: 'Admin Portal', path: '/admin' },
+    { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: '/dashboard' },
+    { icon: <Activity size={18} />, label: 'Prediction', path: '/prediction' },
+    { icon: <TrendingUp size={18} />, label: 'Trends', path: '/trends' },
+    { icon: <MapIcon size={18} />, label: 'Map View', path: '/map' },
+    { icon: <PlayCircle size={18} />, label: 'Simulator', path: '/simulator' },
   ];
 
   return (
@@ -19,7 +22,7 @@ const Sidebar = () => {
           <div className="w-6 h-6 rounded-md bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">AirInsight</span>
+          <span className="text-xl font-bold tracking-tight text-white">EnviroPulse</span>
         </div>
 
         {/* NAVIGATION */}
@@ -53,7 +56,7 @@ const Sidebar = () => {
             <div className="p-3 bg-slate-900/50">
               <div className="flex justify-between items-end mb-1">
                 <span className="text-sm font-bold text-slate-200">Chandrapur</span>
-                <span className="text-rose-500 font-black text-sm">359</span>
+                <span className="text-rose-500 font-black text-sm">87</span>
               </div>
               <div className="text-[10px] text-slate-500 mb-2">Source: <span className="text-slate-400">Mixed Sources</span></div>
               <div className="text-[10px] text-slate-400 bg-rose-950/30 p-2 rounded border border-rose-900/20">

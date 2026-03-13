@@ -70,7 +70,7 @@ const Login = () => {
           <h1 className="text-3xl font-black text-white tracking-tight">
             {isRegisterMode ? 'Admin Registration' : 'System Login'}
           </h1>
-          <p className="text-slate-400 mt-2 text-sm">AirInsight Global Command Center</p>
+          <p className="text-slate-400 mt-2 text-sm">EnviroPulse Global Command Center</p>
         </div>
 
         {error && (

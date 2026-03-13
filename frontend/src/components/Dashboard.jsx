@@ -17,44 +17,35 @@ const Dashboard = () => {
   const fetchAnalytics = async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/analytics/latest`);
-      
-      // The backend returns an array of objects
       const dataArray = response.data;
       
-      // Group by district
-      const districtsMap = {};
-      
-      dataArray.forEach(sensor => {
-        if (!districtsMap[sensor.district]) {
-          districtsMap[sensor.district] = {
-            district: sensor.district,
-            sensors: []
-          };
-        }
-        
-        districtsMap[sensor.district].sensors.push({
-          sensor_name: sensor.sensor_name,
-          latitude: sensor.latitude,
-          longitude: sensor.longitude,
-          latest_reading: {
-            pm25: null, // Since the backend is not directly giving pm25/no2/traffic in this endpoint,
-            no2: null,  // we'll use placeholder or extract from rules if possible.
-            traffic_density: null 
-          },
-          predictions: {
-            predicted_aqi: sensor.aqi,
-            predicted_noise_dba: sensor.noise_db
-          },
-          rules: {
-            derived_cause: sensor.cause,
-            health_advisory: sensor.health_advice,
-            stress_index: sensor.stress_score,
-            stress_category: sensor.stress_category
-          }
-        });
-      });
-
-      const districtsData = Object.values(districtsMap);
+      // Directly map the aggregated district blocks into the format the UI expects
+      const districtsData = dataArray.map(district => ({
+         district: district.district,
+         sensors: [{
+            sensor_name: "Aggregated Network",
+            latitude: district.latitude,
+            longitude: district.longitude,
+            latest_reading: {
+               pm25: district.pollutants.pm25,
+               no2: district.pollutants.no2,
+               traffic_density: Math.round(district.pollutants.traffic_density || 0) // some payload might lack this, fallback to 0
+            },
+            predictions: {
+               predicted_aqi: district.aqi,
+               predicted_noise_dba: district.noise_db,
+               forecast_aqi_1hr: district.aqi * 1.05 // mock forecast visually for now as endpoint returns aggregates
+            },
+            rules: {
+               derived_cause: district.cause,
+               health_index: district.health_index || "Moderate",
+               health_advisory: district.health_advice,
+               stress_index: district.stress_score,
+               stress_category: district.stress_category
+            },
+            timestamp: district.timestamp
+         }]
+      }));
       
       setData(districtsData);
       setLastUpdated(dataArray.length > 0 ? new Date(dataArray[0].timestamp).toLocaleTimeString() : new Date().toLocaleTimeString());
@@ -319,7 +310,6 @@ const CloudDustIcon = () => (
 const ForecastChart = ({ currentValue, forecastValue }) => {
   if (!currentValue || !forecastValue) return null;
   
-  // Dummy data generated around current and forecast for a visual spline
   const data = [
     { time: 'Now', val: currentValue },
     { time: '+15m', val: currentValue + (forecastValue - currentValue) * 0.25 },
@@ -329,26 +319,28 @@ const ForecastChart = ({ currentValue, forecastValue }) => {
   ];
   
   const isIncreasing = forecastValue > currentValue;
-  const strokeColor = isIncreasing ? '#f87171' : '#34d399'; // red-400 or emerald-400
+  const strokeColor = isIncreasing ? '#f87171' : '#34d399';
   const fillColor = isIncreasing ? '#7f1d1d' : '#064e3b';
   
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-        <defs>
-          <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={strokeColor} stopOpacity={0.3}/>
-            <stop offset="95%" stopColor={strokeColor} stopOpacity={0}/>
-          </linearGradient>
-        </defs>
-        <YAxis domain={['dataMin - 5', 'dataMax + 5']} tick={{fontSize: 10, fill: '#64748b'}} tickLine={false} axisLine={false} />
-        <Tooltip 
-          contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
-          itemStyle={{ color: '#e2e8f0', fontSize: '12px' }}
-        />
-        <Area type="monotone" dataKey="val" stroke={strokeColor} strokeWidth={2} fillOpacity={1} fill="url(#colorVal)" />
-      </AreaChart>
-    </ResponsiveContainer>
+    <div className="w-full h-[100px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+          <defs>
+            <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={strokeColor} stopOpacity={0.3}/>
+              <stop offset="95%" stopColor={strokeColor} stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <YAxis domain={['dataMin - 5', 'dataMax + 5']} tick={{fontSize: 10, fill: '#64748b'}} tickLine={false} axisLine={false} />
+          <Tooltip 
+            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+            itemStyle={{ color: '#e2e8f0', fontSize: '12px' }}
+          />
+          <Area type="monotone" dataKey="val" stroke={strokeColor} strokeWidth={2} fillOpacity={1} fill="url(#colorVal)" />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

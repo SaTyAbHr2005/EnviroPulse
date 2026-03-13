@@ -8,7 +8,7 @@ const Header = () => {
         <button className="text-slate-400 hover:text-white transition-colors">
           <Menu size={20} />
         </button>
-        <span className="text-xl font-bold tracking-tight text-white">AirInsight</span>
+        <span className="text-xl font-bold tracking-tight text-white">EnviroPulse</span>
       </div>
 
       <div className="flex items-center gap-4">

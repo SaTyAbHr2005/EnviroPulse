@@ -25,7 +25,7 @@ PostgreSQL instance running with structured normalized tables ready for injectio
 
 ---
 
-### Module 2 – Sensor Simulation Engine 🔜 (Next)
+### Module 2 – Sensor Simulation Engine ✅ (Completed)
 This module generates continuous dynamic telemetry.
 
 **Purpose:**
@@ -44,7 +44,7 @@ A standalone script that behaves like hardware IoT district-nodes. It operates o
 
 ---
 
-### Module 3 – ML Prediction Engine (Planned)
+### Module 3 – ML Prediction Engine ✅ (Completed)
 Handles predictions for AQI and Noise levels using pre-trained regression models.
 
 **Outputs:**
@@ -54,7 +54,7 @@ Handles predictions for AQI and Noise levels using pre-trained regression models
 
 ---
 
-### Module 4 – Environmental Rules Engine (Planned)
+### Module 4 – Environmental Rules Engine ✅ (Completed)
 Calculates causal metrics based on pollution logic.
 
 **Functions:**
@@ -64,7 +64,7 @@ Calculates causal metrics based on pollution logic.
 
 ---
 
-### Module 5 – Backend Results API (Planned)
+### Module 5 – Backend Results API ✅ (Completed)
 The gateway providing near real-time data back to the frontend without WebSockets.
 
 **Endpoints:**
@@ -74,7 +74,7 @@ The gateway providing near real-time data back to the frontend without WebSocket
 
 ---
 
-### Module 6 – Data Fetching & Dashboard Controller (Planned)
+### Module 6 – Data Fetching & Dashboard Controller 🔜 (Next)
 The React controller governing constant state updates.
 
 **Features:**
@@ -84,7 +84,7 @@ The React controller governing constant state updates.
 
 ---
 
-### Module 7 – Geo-Spatial Visualization Layer (Planned)
+### Module 7 – Geo-Spatial Visualization Layer ✅ (Completed)
 The interactive map plotting sensor metadata.
 
 **Features:**
@@ -121,12 +121,12 @@ EnviroPulse operates primarily on a pull-based asynchronous architecture.
 | Module | Status |
 |--------|--------|
 | Module 1 – Initialization & Database Setup | ✅ Completed |
-| Module 2 – Sensor Simulation Engine | 🔜 Next |
-| Module 3 – ML Prediction Engine | Planned |
-| Module 4 – Environmental Rules Engine | Planned |
-| Module 5 – Backend Results API | Planned |
-| Module 6 – Data Fetching & UI Controller | Planned |
-| Module 7 – Geo-Spatial Visualization Layer | Planned |
+| Module 2 – Sensor Simulation Engine | ✅ Completed |
+| Module 3 – ML Prediction Engine | ✅ Completed |
+| Module 4 – Environmental Rules Engine | ✅ Completed |
+| Module 5 – Backend Results API | ✅ Completed |
+| Module 6 – Data Fetching & UI Controller | 🔜 Next |
+| Module 7 – Geo-Spatial Visualization Layer | ✅ Completed |
 | Module 8 – Advanced Analytics UI | Planned |
 
 ---

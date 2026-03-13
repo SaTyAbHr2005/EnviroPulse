@@ -15,6 +15,19 @@ from backend.models.domain_models import Base, District, Sensor, Reading
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+DISTRICT_COORDS = {
+    'Mumbai City': (19.0188, 72.8553), # Shifted slightly East / inland away from coast
+    'Pune': (18.5204, 73.8567),
+    'Nagpur': (21.1458, 79.0882),
+    'Nashik': (19.9975, 73.7898),
+    'Thane': (19.2183, 72.9781),
+    'Aurangabad': (19.8762, 75.3433),
+    'Kolhapur': (16.7050, 74.2433),
+    'Solapur': (17.6599, 75.9064),
+    'Amravati': (20.9320, 77.7523),
+    'Nanded': (19.1383, 77.3210)
+}
+
 # Ensure tables exist (we rely on schema.sql but this is a fallback)
 Base.metadata.create_all(bind=engine)
 
@@ -40,8 +53,8 @@ def initialize_sensors(db: Session):
                     new_sensor = Sensor(
                         sensor_name=sensor_name,
                         district_id=district.id,
-                        latitude=random.uniform(15.0, 22.0), # Approx Maharashtra lat bounds
-                        longitude=random.uniform(72.0, 80.0), # Approx Maharashtra lon bounds
+                        latitude=DISTRICT_COORDS.get(district.name, (19.0, 75.0))[0] + random.uniform(-0.02, 0.02),
+                        longitude=DISTRICT_COORDS.get(district.name, (19.0, 75.0))[1] + random.uniform(-0.02, 0.02),
                         status='active'
                     )
                     db.add(new_sensor)
@@ -82,7 +95,11 @@ def run_simulation(interval_seconds=30):
 
         while True:
             readings_count = 0
-            for sensor in sensors:
+            
+            # Re-fetch sensors from DB every tick to immediately catch Admin "inactive" toggles
+            current_sensors = db.query(Sensor).all()
+            
+            for sensor in current_sensors:
                 if sensor.status != 'active':
                     continue
                     

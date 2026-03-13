@@ -1,0 +1,42 @@
+============================================================
+  EnviroPulse - Model Accuracy Report
+============================================================
+
+[MODEL 1] AQI Prediction (CatBoost)
+----------------------------------------
+  Test Samples : 96146
+  RMSE         : 46.8728
+  MAE          : 32.1219
+  R2 Score     : 0.8317
+
+[MODEL 2] AQI Forecast (CatBoost)
+----------------------------------------
+  Test Samples : 96100
+  RMSE         : 7.1823
+  MAE          : 2.6228
+  R2 Score     : 0.9931
+
+[MODEL 3] Noise Prediction (XGBoost)
+----------------------------------------
+  [WARN] Feature mismatch. Quick retrain for evaluation...
+  Test Samples : 400
+  RMSE         : 11.3040
+  MAE          : 9.1174
+  R2 Score     : -0.1791
+
+  Top feature correlations with decibel_level:
+    day_of_week               0.0513
+    population_density        0.0416
+    holiday                   0.0409
+    traffic_density           0.0387
+    is_weekend                0.0379
+
+============================================================
+  FINAL SUMMARY
+============================================================
+  Model                              RMSE      MAE       R2
+  ------------------------------ -------- -------- --------
+  AQI Prediction (CatBoost)         46.87    32.12   0.8317
+  AQI Forecast (CatBoost)            7.18     2.62   0.9931
+  Noise Prediction (XGBoost)        11.30     9.12  -0.1791
+============================================================

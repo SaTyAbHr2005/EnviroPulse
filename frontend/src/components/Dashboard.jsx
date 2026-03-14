@@ -34,7 +34,8 @@ const Dashboard = () => {
             latest_reading: {
                pm25: district.pollutants.pm25,
                no2: district.pollutants.no2,
-               traffic_density: Math.round(district.pollutants.traffic_density || 0) // some payload might lack this, fallback to 0
+               co: district.pollutants.co,
+               traffic_density: district.traffic_density
             },
             predictions: {
                predicted_aqi: district.aqi,

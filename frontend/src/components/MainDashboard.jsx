@@ -27,10 +27,6 @@ const MainDashboard = () => {
    // Use centralized telemetry store (SWR pattern)
    const { data: regionData, topPolluted, loading } = useCityTelemetry(selectedDistrict);
 
-   // If user lands here without selecting a region, bounce them to selector
-   if (!selectedDistrict) {
-      return <Navigate to="/" replace />;
-   }
 
    // Render loading state ONLY if we don't even have a cache hit
    if (loading && !regionData) {

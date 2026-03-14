@@ -27,11 +27,30 @@ def get_latest_analytics(db: Session = Depends(get_db)):
     # 1. Get all active sensors
     sensors = db.query(Sensor).filter(Sensor.status == 'active').all()
     
+    # 2. Optimized Fetch: Get the single latest reading for EVERY sensor in one go
+    # using a subquery to avoid N+1 issues
+    from sqlalchemy import and_
+    
+    subquery = db.query(
+        Reading.sensor_id,
+        func.max(Reading.timestamp).label('max_ts')
+    ).group_by(Reading.sensor_id).subquery()
+
+    latest_readings = db.query(Reading).join(
+        subquery,
+        and_(
+            Reading.sensor_id == subquery.c.sensor_id,
+            Reading.timestamp == subquery.c.max_ts
+        )
+    ).all()
+
+    # Map for easy lookup
+    reading_map = {r.sensor_id: r for r in latest_readings}
+    
     district_data = {}
 
     for sensor in sensors:
-        # 2. Get the very latest reading for this specific sensor
-        latest_reading = db.query(Reading).filter(Reading.sensor_id == sensor.id).order_by(Reading.timestamp.desc()).first()
+        latest_reading = reading_map.get(sensor.id)
         
         if not latest_reading:
             continue
@@ -43,6 +62,7 @@ def get_latest_analytics(db: Session = Depends(get_db)):
                 "count": 0,
                 "pm25": 0.0, "pm10": 0.0, "no2": 0.0, "co": 0.0, "so2": 0.0, "o3": 0.0, "nh3": 0.0,
                 "traffic_density": 0.0,
+                "noise_db": 0.0,
                 "latitude": 0.0,
                 "longitude": 0.0,
                 "timestamp": latest_reading.timestamp
@@ -58,6 +78,7 @@ def get_latest_analytics(db: Session = Depends(get_db)):
         d["o3"] += latest_reading.o3
         d["nh3"] += latest_reading.nh3
         d["traffic_density"] += latest_reading.traffic_density
+        d["noise_db"] += latest_reading.noise_db
         d["latitude"] += sensor.latitude
         d["longitude"] += sensor.longitude
         
@@ -82,17 +103,19 @@ def get_latest_analytics(db: Session = Depends(get_db)):
         }
         
         avg_traffic_density = data["traffic_density"] / count
+        avg_noise_db = data["noise_db"] / count
         avg_latitude = data["latitude"] / count
         avg_longitude = data["longitude"] / count
 
         # 4. Perform ML Predictions on Aggregated Data
         predicted_aqi = aqi_predictor.predict_aqi(pollutants)
         
-        traffic_req = { "traffic_density": avg_traffic_density }
-        predicted_noise = noise_predictor.predict_noise(traffic_req)
+        # We now use the actual aggregated noise records from the sensor network
+        # instead of a purely traffic-based prediction for better realism.
+        final_noise = round(avg_noise_db, 2)
 
         # 5. Derive Insights via Rules Engine
-        stress = calculate_stress_index(predicted_aqi, predicted_noise, avg_traffic_density)
+        stress = calculate_stress_index(predicted_aqi, final_noise, avg_traffic_density)
         cause = detect_pollution_cause(pollutants["pm25"], pollutants["pm10"], pollutants["so2"], avg_traffic_density)
         advisory = get_health_advisory(predicted_aqi)
 
@@ -101,7 +124,7 @@ def get_latest_analytics(db: Session = Depends(get_db)):
             "latitude": avg_latitude,
             "longitude": avg_longitude,
             "aqi": predicted_aqi,
-            "noise_db": predicted_noise,
+            "noise_db": final_noise,
             "stress_score": stress["score"],
             "stress_category": stress["category"],
             "stress_action": stress["action"],
@@ -110,7 +133,8 @@ def get_latest_analytics(db: Session = Depends(get_db)):
             "health_color": advisory["color"],
             "health_advice": advisory["advice"],
             "timestamp": data["timestamp"],
-            "pollutants": pollutants
+            "pollutants": pollutants,
+            "traffic_density": round(avg_traffic_density, 2)
         })
 
     return results
@@ -142,10 +166,10 @@ def get_sensors_telemetry(db: Session = Depends(get_db)):
         
         # ML Predictions for this specific sensor
         predicted_aqi = aqi_predictor.predict_aqi(pollutants)
-        predicted_noise = noise_predictor.predict_noise({"traffic_density": latest_reading.traffic_density})
+        sensor_noise = latest_reading.noise_db
         
         # Rules Engine for this specific sensor
-        stress = calculate_stress_index(predicted_aqi, predicted_noise, latest_reading.traffic_density)
+        stress = calculate_stress_index(predicted_aqi, sensor_noise, latest_reading.traffic_density)
         cause = detect_pollution_cause(latest_reading.pm25, latest_reading.pm10, latest_reading.so2, latest_reading.traffic_density)
         advisory = get_health_advisory(predicted_aqi)
 
@@ -156,7 +180,7 @@ def get_sensors_telemetry(db: Session = Depends(get_db)):
             "latitude": sensor.latitude,
             "longitude": sensor.longitude,
             "aqi": predicted_aqi,
-            "noise_db": predicted_noise,
+            "noise_db": sensor_noise,
             "stress_score": stress["score"],
             "stress_category": stress["category"],
             "cause": cause,
@@ -195,7 +219,7 @@ def get_district_analytics(district_name: str, db: Session = Depends(get_db)):
         return fallback_response
         
     count = 0
-    pm25, pm10, no2, co, so2, o3, nh3, traffic_density = 0, 0, 0, 0, 0, 0, 0, 0
+    pm25, pm10, no2, co, so2, o3, nh3, traffic_density, noise_db = 0, 0, 0, 0, 0, 0, 0, 0, 0
     latest_ts = None
     
     for sensor in sensors:
@@ -211,6 +235,7 @@ def get_district_analytics(district_name: str, db: Session = Depends(get_db)):
         o3 += reading.o3
         nh3 += reading.nh3
         traffic_density += reading.traffic_density
+        noise_db += reading.noise_db
         if not latest_ts or reading.timestamp > latest_ts:
             latest_ts = reading.timestamp
             
@@ -222,10 +247,10 @@ def get_district_analytics(district_name: str, db: Session = Depends(get_db)):
         "co": co / count, "so2": so2 / count, "o3": o3 / count, "nh3": nh3 / count
     }
     avg_traffic = traffic_density / count
+    avg_noise = noise_db / count
     
     predicted_aqi = aqi_predictor.predict_aqi(pollutants)
-    predicted_noise = noise_predictor.predict_noise({"traffic_density": avg_traffic})
-    stress = calculate_stress_index(predicted_aqi, predicted_noise, avg_traffic)
+    stress = calculate_stress_index(predicted_aqi, avg_noise, avg_traffic)
     cause = detect_pollution_cause(pollutants["pm25"], pollutants["pm10"], pollutants["so2"], avg_traffic)
     advisory = get_health_advisory(predicted_aqi)
     
@@ -233,12 +258,13 @@ def get_district_analytics(district_name: str, db: Session = Depends(get_db)):
         "district": district.name,
         "timestamp": latest_ts,
         "aqi": predicted_aqi,
-        "noise_db": predicted_noise,
+        "noise_db": round(avg_noise, 2),
         "stress_score": stress["score"],
         "stress_category": stress["category"],
         "cause": cause,
         "health_advice": advisory["advice"],
-        "pollutants": pollutants
+        "pollutants": pollutants,
+        "traffic_density": round(avg_traffic, 2)
     }
 
 @router.get("/top-polluted")

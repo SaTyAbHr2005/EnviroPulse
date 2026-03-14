@@ -28,10 +28,7 @@ const Header = () => {
   return (
     <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-50 transition-colors duration-300">
       <div className="flex items-center gap-4">
-        <button className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
-          <Menu size={20} />
-        </button>
-        <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">EnviroPulse</span>
+        {/* Brand name removed per user request */}
       </div>
 
       <div className="flex items-center gap-4">
@@ -43,15 +40,6 @@ const Header = () => {
           </span>
           <span className="text-xs font-black text-emerald-600 dark:text-emerald-500 tracking-wide uppercase transition-colors">System Live</span>
         </div>
-
-        {/* Theme Toggle */}
-        <button 
-          onClick={() => setIsDark(!isDark)}
-          className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        >
-          {isDark ? <Sun size={18} /> : <Moon size={18} className="text-slate-600" />}
-        </button>
 
         {/* Profile Avatar */}
         <button 

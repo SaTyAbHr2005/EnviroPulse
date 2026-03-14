@@ -27,12 +27,6 @@ const LandingPage = () => {
                <span className="text-2xl font-black tracking-tighter text-white">Enviro<span className="text-blue-500">Pulse</span></span>
             </div>
             
-            <nav className="hidden md:flex gap-8 text-sm font-semibold tracking-wide text-slate-400">
-               <span className="hover:text-blue-400 cursor-pointer transition-colors">Platform</span>
-               <span className="hover:text-blue-400 cursor-pointer transition-colors">Digital Twin</span>
-               <span className="hover:text-blue-400 cursor-pointer transition-colors">Impact API</span>
-            </nav>
-
             <div className="flex gap-4">
               <button 
                   onClick={() => navigate('/login')}
@@ -47,7 +41,7 @@ const LandingPage = () => {
         {/* Hero Content */}
         <main className="flex-1 flex flex-col items-center justify-center text-center max-w-4xl mx-auto w-full mt-8 lg:mt-0">
             <div className="px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
-                Next-Gen Intelligence for Global Air Quality
+               AI-Driven Environmental Stress Monitoring Using Distributed Sensor Networks.
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-500 mb-6 tracking-tight leading-tight">

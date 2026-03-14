@@ -76,8 +76,8 @@ export const useCityTelemetry = (districtName) => {
     // Initial silent fetch
     fetchFreshData();
 
-    // 3. Centralized Polling Loop (Every 5 seconds)
-    const intervalId = setInterval(fetchFreshData, 5000);
+    // 3. Centralized Polling Loop (Every 3 seconds)
+    const intervalId = setInterval(fetchFreshData, 3000);
 
     return () => {
       isMounted = false;

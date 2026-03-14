@@ -121,7 +121,7 @@ def stop_simulation():
 def is_running():
     return SIMULATION_ACTIVE
 
-def run_simulation_loop(interval_seconds=30):
+def run_simulation_loop(interval_seconds=10):
     """
     Designed to be fired asynchronously by FastAPI BackgroundTasks.
     It monitors the SIMULATION_ACTIVE flag to break cleanly.

@@ -4,20 +4,33 @@ from typing import List
 import random
 
 from backend.config.database import get_db
-from backend.models.domain_models import Sensor, District
+from backend.models.domain_models import Sensor, District, User
 from backend.schemas.domain_schemas import SensorCreate, SensorResponse
+from backend.api.auth_routes import get_current_admin
 
 router = APIRouter(
     prefix="/sensors",
     tags=["sensors"]
 )
 
-@router.get("/", response_model=List[SensorResponse])
+@router.get("/")
 def get_sensors(db: Session = Depends(get_db)):
-    return db.query(Sensor).all()
+    sensors = db.query(Sensor).all()
+    results = []
+    for s in sensors:
+        results.append({
+            "id": s.id,
+            "sensor_name": s.sensor_name,
+            "district_id": s.district_id,
+            "district": s.district.name if s.district else "Unknown",
+            "latitude": s.latitude,
+            "longitude": s.longitude,
+            "status": s.status
+        })
+    return results
 
 @router.post("/", response_model=SensorResponse, status_code=status.HTTP_201_CREATED)
-def create_sensor(sensor: SensorCreate, db: Session = Depends(get_db)):
+def create_sensor(sensor: SensorCreate, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
     # Check if district exists
     district = db.query(District).filter(District.id == sensor.district_id).first()
     if not district:
@@ -46,7 +59,7 @@ def create_sensor(sensor: SensorCreate, db: Session = Depends(get_db)):
     return new_sensor
 
 @router.delete("/{sensor_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_sensor(sensor_id: int, db: Session = Depends(get_db)):
+def delete_sensor(sensor_id: int, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
     db_sensor = db.query(Sensor).filter(Sensor.id == sensor_id).first()
     if not db_sensor:
         raise HTTPException(status_code=404, detail="Sensor not found")
@@ -60,4 +73,19 @@ def get_sensor(sensor_id: int, db: Session = Depends(get_db)):
     db_sensor = db.query(Sensor).filter(Sensor.id == sensor_id).first()
     if not db_sensor:
         raise HTTPException(status_code=404, detail="Sensor not found")
+    return db_sensor
+
+@router.put("/{sensor_id}/status", response_model=SensorResponse)
+def toggle_sensor_status(sensor_id: int, status_update: dict, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
+    db_sensor = db.query(Sensor).filter(Sensor.id == sensor_id).first()
+    if not db_sensor:
+        raise HTTPException(status_code=404, detail="Sensor not found")
+        
+    new_status = status_update.get("status")
+    if new_status not in ["active", "inactive"]:
+        raise HTTPException(status_code=400, detail="Invalid status. Must be 'active' or 'inactive'")
+        
+    db_sensor.status = new_status
+    db.commit()
+    db.refresh(db_sensor)
     return db_sensor

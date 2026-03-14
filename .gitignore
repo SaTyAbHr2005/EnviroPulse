@@ -23,30 +23,43 @@ wheels/
 .venv
 venv/
 ENV/
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Environment variables
+# Environment
 .env
+.env.local
+.env.*.local
+*.env
 
 # Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 frontend/node_modules/
 frontend/dist/
-frontend/.DS_Store
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
 
-# Databases
-*.db
-*.sqlite3
-
-# IDEs
+# IDE & OS
 .vscode/
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
+.DS_Store
+Thumbs.db
 
-# Project specific
+# Project-Specific
 backend/training/catboost_info/
-# NOTE: backend/models is EXPLICITLY INCLUDED as per user requirement to keep .pkl files
+backend/ml/__pycache__/
+backend/api/__pycache__/
+backend/rules/__pycache__/
+backend/simulator/__pycache__/
+
+# Keep ML Models as requested in previous sessions
 !backend/models/*.pkl
 !backend/models/*.png
+!backend/models/*.joblib

@@ -38,7 +38,7 @@ Districts(id, name, state)
 
 ---
 
-### Module 2 – Sensor Simulation Engine 🔜 (Next)
+### Module 2 – Sensor Simulation Engine ✅ (Completed)
 This module generates continuous dynamic telemetry resembling active SOC environments.
 
 **Workflow:**
@@ -61,7 +61,7 @@ INSERT INTO PostgreSQL `readings` (every 30s)
 
 ---
 
-### Module 3 – ML Prediction Engine (Planned)
+### Module 3 – ML Prediction Engine ✅ (Completed)
 Handles computational predictions asynchronously for AQI and Noise levels.
 
 **Frameworks & Outputs:**
@@ -74,7 +74,7 @@ Reduces calculation loads from the Frontend mapping by solving regressions serve
 
 ---
 
-### Module 4 – Environmental Rules Engine (Planned)
+### Module 4 – Environmental Rules Engine ✅ (Completed)
 Calculates causal metrics based on empirical pollution logic structures.
 
 **Functions:**
@@ -87,7 +87,7 @@ Produces actionable semantic metadata instead of just numbers for the end-user.
 
 ---
 
-### Module 5 – Backend Results API (Planned)
+### Module 5 – Backend Results API ✅ (Completed)
 Serves structured data JSON bundles via lightweight RESTful endpoints.
 
 **Endpoints:**
@@ -100,36 +100,37 @@ Enables standard HTTP fetching methodologies eliminating stateful WebSocket trac
 
 ---
 
-### Module 6 – Data Fetching & Dashboard Controller (Planned)
+### Module 6 – Data Fetching & Dashboard Controller ✅ (Completed)
 The front-end client interface processing incoming backend payloads.
 
 **Architecture:**
-- Initial layout definitions utilizing Vite, React, and Tailwind CSS.
-- Periodic polling utility (`setInterval` calling API every 3–5 seconds explicitly).
-- Central state manager routing context updates to modular cards natively without redundant renders.
+- **3-Zone Layout**: Orchestrated UI consisting of a persistent Sidebar, a 12-column Main Analytics Hub, and a dedicated Impact Intelligence Sidebar.
+- **SWR Data Pattern**: Implemented "Stale-While-Revalidate" logic via `useCityTelemetry` hook, ensuring instant UI responses with background data synchronization.
+- **Centralized Telemetry Store**: Global cache instance for persisting district data across navigation.
 
 **Benefits:**
-Simplistic integration simulating near-RT socket functionality with superior fault tolerance.
+- Eliminates UI flicker during data updates.
+- Decouples UI components from complex API orchestration.
 
 ---
 
-### Module 7 – Geo-Spatial Visualization Layer (Planned)
+### Module 7 – Geo-Spatial Visualization Layer ✅ (Completed)
 Leaflet interactive map plotting dynamic sensory data over topological UI constraints.
 
 **Components:**
-- Leaflet map rendering District specific mapped bounds (Maharashtra).
-- Contextual OpenStreetMap SVG Markers reacting to local Environmental Stress Limits (Green/Yellow/Orange/Red).
-- Real-time interactable SVG popups loading deep insights dynamically based on Component Context.
+- Leaflet map rendering regional sensor markers.
+- Contextual status indicators reacting to local Environmental Stress levels.
+- Real-time interactable popups loading deep insights dynamically.
 
 ---
 
-### Module 8 – Advanced Analytics UI (Planned)
-Data-dense React Rechart widgets converting complex metrics into readable structures.
+### Module 8 – Advanced Analytics UI ✅ (Completed)
+Data-dense React components converting complex metrics into readable structures.
 
 **Features:**
-- Time-series progression charting.
-- Stress Level Gauges rendering 0-100 indexed severity curves visually.
-- Responsive flex-layouts gracefully displaying ML forethoughts alongside live updates.
+- **Impact Intelligence Hub**: Visualization of environmental stress on Agriculture, Wildlife, and Economy.
+- **Causal UI**: Dynamic iconography mapped to ML-detected pollution sources (Cars for traffic, Factories for industry).
+- **Leaderboard System**: Top polluted regions tracker aggregated from the entire sensor network.
 
 ---
 
@@ -151,10 +152,10 @@ Future tools to extend capability:
 | Module | Status |
 |--------|--------|
 | Module 1 – Initialization & Database Setup | ✅ Completed |
-| Module 2 – Sensor Simulation Engine | 🔜 Next |
-| Module 3 – ML Prediction Engine | Planned |
-| Module 4 – Environmental Rules Engine | Planned |
-| Module 5 – Backend Results API | Planned |
-| Module 6 – Data Fetching & UI Controller | Planned |
-| Module 7 – Geo-Spatial Visualization Layer | Planned |
-| Module 8 – Advanced Analytics UI | Planned |
+| Module 2 – Sensor Simulation Engine | ✅ Completed |
+| Module 3 – ML Prediction Engine | ✅ Completed |
+| Module 4 – Environmental Rules Engine | ✅ Completed |
+| Module 5 – Backend Results API | ✅ Completed |
+| Module 6 – Data Fetching & UI Controller | ✅ Completed |
+| Module 7 – Geo-Spatial Visualization Layer | ✅ Completed |
+| Module 8 – Advanced Analytics UI | ✅ Completed |

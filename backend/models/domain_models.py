@@ -29,6 +29,7 @@ class Sensor(Base):
     district_id = Column(Integer, ForeignKey("districts.id", ondelete="CASCADE"))
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    coverage_radius = Column(Integer, nullable=True)
     status = Column(String(20), default="active")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

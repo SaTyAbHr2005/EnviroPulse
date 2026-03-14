@@ -13,9 +13,21 @@ router = APIRouter(
     tags=["sensors"]
 )
 
-@router.get("/", response_model=List[SensorResponse])
+@router.get("/")
 def get_sensors(db: Session = Depends(get_db)):
-    return db.query(Sensor).all()
+    sensors = db.query(Sensor).all()
+    results = []
+    for s in sensors:
+        results.append({
+            "id": s.id,
+            "sensor_name": s.sensor_name,
+            "district_id": s.district_id,
+            "district": s.district.name if s.district else "Unknown",
+            "latitude": s.latitude,
+            "longitude": s.longitude,
+            "status": s.status
+        })
+    return results
 
 @router.post("/", response_model=SensorResponse, status_code=status.HTTP_201_CREATED)
 def create_sensor(sensor: SensorCreate, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):

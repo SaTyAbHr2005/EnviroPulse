@@ -5,13 +5,16 @@ import Dashboard from './components/Dashboard'; // Old map dashboard sideview
 import MainDashboard from './components/MainDashboard';
 import StressPrediction from './components/StressPrediction';
 import TrendsDashboard from './components/TrendsDashboard';
-import SimulatorPanel from './components/SimulatorPanel';
 import RegionSelector from './components/RegionSelector';
 import { RegionProvider } from './context/RegionContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
-import AdminPanel from './components/AdminPanel';
 import ProtectedRoute from './components/ProtectedRoute';
+
+// New Architecture Components
+import LandingPage from './components/LandingPage';
+import AdminSimulator from './components/AdminSimulator';
+import AdminControlPanel from './components/AdminControlPanel';
 
 function App() {
   return (
@@ -21,19 +24,21 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             
-            {/* Initial Region Selection */}
-            <Route path="/" element={<RegionSelector />} />
+            {/* Public Architecture */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/select-region" element={<RegionSelector />} />
             
             {/* Main App Layout Routes */}
             <Route path="/map" element={<Layout><Dashboard /></Layout>} />
           <Route path="/dashboard" element={<Layout><MainDashboard /></Layout>} />
           <Route path="/prediction" element={<Layout><StressPrediction /></Layout>} />
           <Route path="/trends" element={<Layout><TrendsDashboard /></Layout>} />
-          <Route path="/simulator" element={<Layout><SimulatorPanel /></Layout>} />
           
           {/* Protected Admin Routes */}
           <Route element={<ProtectedRoute />}>
-             <Route path="/admin" element={<Layout><AdminPanel /></Layout>} />
+             <Route path="/admin" element={<Navigate to="/admin/control-panel" replace />} />
+             <Route path="/admin/control-panel" element={<Layout><AdminControlPanel /></Layout>} />
+             <Route path="/admin/simulator" element={<Layout><AdminSimulator /></Layout>} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Activity, AlertTriangle, Wind } from 'lucide-react';
+import { getStressColor } from '../utils/metricColors';
 
 const BACKEND_URL = 'http://localhost:8000';
 
@@ -90,10 +91,7 @@ const StressPrediction = () => {
       const circumference = 2 * Math.PI * radius;
       const strokeDashoffset = score ? circumference - (score / 100) * circumference : circumference;
       
-      let color = '#3b82f6'; // blue (default)
-      if (score > 70) color = '#ef4444'; // red (High)
-      else if (score > 40) color = '#f59e0b'; // amber (Moderate)
-      else if (score > 0) color = '#10b981'; // green (Low)
+      const color = score ? getStressColor(score) : '#3b82f6'; // blue (default if no score)
 
       return { radius, circumference, strokeDashoffset, color };
   };
@@ -219,10 +217,8 @@ const StressPrediction = () => {
                 
                 {/* Background ambient glow based on result */}
                 <div className={`absolute top-0 right-0 w-full h-full opacity-10 blur-[100px] pointer-events-none transition-colors duration-1000 ${
-                  !result ? 'bg-blue-500' :
-                  result.stress_score > 70 ? 'bg-rose-600' : 
-                  result.stress_score > 40 ? 'bg-amber-500' : 'bg-emerald-500'
-                }`}></div>
+                  !result ? 'bg-blue-500' : ''
+                }`} style={{ backgroundColor: result ? getStressColor(result.stress_score) : undefined }}></div>
 
                 <div className="flex items-center gap-2 w-full justify-center mb-10 z-10">
                    <Activity className="w-5 h-5 text-slate-400" />
@@ -266,11 +262,10 @@ const StressPrediction = () => {
 
                 {/* Category Badge */}
                 <div className="z-10 w-full flex justify-center mb-12">
-                   <div className={`px-6 py-2 rounded-full border border-opacity-30 backdrop-blur-sm shadow-lg ${
-                      !result ? 'bg-slate-800/50 border-slate-600 text-slate-400' :
-                      result.stress_score > 70 ? 'bg-rose-500/10 border-rose-500 text-rose-400' : 
-                      result.stress_score > 40 ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-                   }`}>
+                   <div 
+                      className={`px-6 py-2 rounded-full border backdrop-blur-sm shadow-lg ${!result ? 'bg-slate-800/50 border-slate-600 text-slate-400' : 'border-opacity-30'}`}
+                      style={result ? { backgroundColor: `${getStressColor(result.stress_score)}20`, borderColor: getStressColor(result.stress_score), color: getStressColor(result.stress_score) } : {}}
+                   >
                       <span className="text-xs font-black uppercase tracking-widest">
                          {result ? result.stress_category : 'AWAITING INPUT'}
                       </span>
@@ -299,15 +294,15 @@ const StressPrediction = () => {
             
             {/* Critical Regions Mini-Card matching the prompt requirement */}
             <div className="bg-rose-950/20 backdrop-blur-md border border-rose-900/30 rounded-2xl p-5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.3)]">
-               <h4 className="text-[10px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-2 mb-3">
+               <h4 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 mb-3" style={{ color: getStressColor(87) }}>
                   <AlertTriangle className="w-3.5 h-3.5" /> Critical Regions
                </h4>
                <div className="bg-[#0f172a]/80 rounded-lg p-4 border border-slate-800">
                   <div className="flex justify-between items-start mb-2">
-                     <span className="font-bold text-slate-200">Chandrapur</span>
-                     <span className="font-black text-rose-500">87</span>
+                     <span className="font-bold text-slate-200">Solapur</span>
+                     <span className="font-black" style={{ color: getStressColor(87) }}>87</span>
                   </div>
-                  <p className="text-xs text-rose-400/80 mb-1">Status: High Environmental Stress</p>
+                  <p className="text-xs mb-1" style={{ color: getStressColor(87) }}>Status: High Environmental Stress</p>
                   <p className="text-xs text-slate-400">Advice: Avoid outdoor activity</p>
                </div>
             </div>

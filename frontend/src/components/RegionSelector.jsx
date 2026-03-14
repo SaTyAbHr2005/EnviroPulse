@@ -9,8 +9,6 @@ const MOCK_DISTRICTS = [
   { name: 'Nagpur', aqi: 145, status: 'Poor', color: 'bg-orange-500', text: 'text-orange-400' },
   { name: 'Nashik', aqi: 85, status: 'Moderate', color: 'bg-amber-500', text: 'text-amber-400' },
   { name: 'Solapur', aqi: 281, status: 'Severe', color: 'bg-rose-500', text: 'text-rose-400' },
-  { name: 'Aurangabad', aqi: 205, status: 'Severe', color: 'bg-rose-500', text: 'text-rose-400' },
-  { name: 'Chandrapur', aqi: 359, status: 'Severe', color: 'bg-rose-500', text: 'text-rose-400' },
   { name: 'Kolhapur', aqi: 45, status: 'Good', color: 'bg-emerald-500', text: 'text-emerald-400' },
   { name: 'Amravati', aqi: 110, status: 'Poor', color: 'bg-orange-500', text: 'text-orange-400' },
   { name: 'Nanded', aqi: 95, status: 'Moderate', color: 'bg-amber-500', text: 'text-amber-400' },

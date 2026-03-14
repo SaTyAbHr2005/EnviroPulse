@@ -33,35 +33,35 @@ DISTRICT_COORDS = {
 Base.metadata.create_all(bind=engine)
 
 def initialize_sensors(db: Session):
-    """Ensure each district has 4 specific zone sensors."""
+    """Ensure each district has 4 specific zone sensors using the strict naming format."""
     districts = db.query(District).all()
     if not districts:
         logger.warning("No districts found. Please run database/schema.sql first.")
         return []
 
     active_sensors = []
-    zone_types = ['Traffic_Junction', 'Industrial_Area', 'Residential_Zone', 'Highway_Zone']
     
     for district in districts:
-        existing_sensors = db.query(Sensor).filter(Sensor.district_id == district.id).all()
+        prefix = district.name[:3].upper()
+        existing_sensors = db.query(Sensor).filter(Sensor.district_id == district.id).order_by(Sensor.id).all()
         
-        # We need to guarantee exactly these 4 sensors per district exist. 
-        # For simplicity, if they have less than 4, we spawn the missing ones.
-        existing_names = [s.sensor_name for s in existing_sensors]
-        
-        for z_name in zone_types:
-            sensor_name = f"{district.name.replace(' ', '_')}_{z_name}"
-            if sensor_name not in existing_names:
-                new_sensor = Sensor(
-                    sensor_name=sensor_name,
-                    district_id=district.id,
-                    latitude=DISTRICT_COORDS.get(district.name, (19.0, 75.0))[0] + random.uniform(-0.02, 0.02),
-                    longitude=DISTRICT_COORDS.get(district.name, (19.0, 75.0))[1] + random.uniform(-0.02, 0.02),
-                    status='active'
-                )
-                db.add(new_sensor)
-        
-        db.commit()
+        # We ensure at least 4 sensors exist per district (001 to 004)
+        count = len(existing_sensors)
+        if count < 4:
+            for i in range(count + 1, 5):
+                sensor_name = f"{prefix}{i:03d}"
+                # Check if this name exists (unlikely but safe)
+                exists = db.query(Sensor).filter(Sensor.sensor_name == sensor_name).first()
+                if not exists:
+                    new_sensor = Sensor(
+                        sensor_name=sensor_name,
+                        district_id=district.id,
+                        latitude=DISTRICT_COORDS.get(district.name, (19.0, 75.0))[0] + random.uniform(-0.02, 0.02),
+                        longitude=DISTRICT_COORDS.get(district.name, (19.0, 75.0))[1] + random.uniform(-0.02, 0.02),
+                        status='active'
+                    )
+                    db.add(new_sensor)
+            db.commit()
             
         existing_sensors = db.query(Sensor).filter(Sensor.district_id == district.id).all()
         active_sensors.extend(existing_sensors)
@@ -69,9 +69,11 @@ def initialize_sensors(db: Session):
     return active_sensors
 
 def generate_pollution_data(sensor_name: str, district_name: str) -> dict:
-    """Generate mock but realistic bounds based on exact geographic region and sensor zone type."""
-    is_traffic = 'Traffic' in sensor_name or 'Highway' in sensor_name
-    is_industrial = 'Industrial' in sensor_name
+    """Generate mock but realistic bounds based on exact geographic region and sensor identity."""
+    # Zone type detection:
+    # 001 -> Traffic, 002 -> Industrial, 003 -> Residential, 004 -> Highway
+    is_traffic = "001" in sensor_name or "004" in sensor_name or "Traffic" in sensor_name or "Highway" in sensor_name
+    is_industrial = "002" in sensor_name or "Industrial" in sensor_name
     
     # Grab geographic baseline or fallback to a moderate profile
     profile = REGION_PROFILES.get(district_name, REGION_PROFILES["Pune"])

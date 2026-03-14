@@ -1,6 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea, LineChart, Line, Legend } from 'recharts';
 import { TrendingUp, AlertTriangle } from 'lucide-react';
+import { getAQIColor } from '../utils/metricColors';
 
 // Mocked historical time-series data
 const trajectoryData = [
@@ -134,10 +135,12 @@ const TrendsDashboard = () => {
               <Tooltip content={<CustomTrajectoryTooltip />} cursor={{ stroke: '#475569', strokeWidth: 1, strokeDasharray: '4 4' }} />
               
               {/* Threshold Background Bands for AQI */}
-              <ReferenceArea y1={0} y2={50} fill="#10b981" fillOpacity={0.03} />    {/* Good */}
-              <ReferenceArea y1={50} y2={100} fill="#f59e0b" fillOpacity={0.04} />  {/* Moderate */}
-              <ReferenceArea y1={100} y2={200} fill="#f97316" fillOpacity={0.05} /> {/* Poor */}
-              <ReferenceArea y1={200} y2={300} fill="#ef4444" fillOpacity={0.06} /> {/* Hazardous */}
+              <ReferenceArea y1={0} y2={50} fill={getAQIColor(50)} fillOpacity={0.03} />
+              <ReferenceArea y1={50} y2={100} fill={getAQIColor(100)} fillOpacity={0.04} />
+              <ReferenceArea y1={100} y2={200} fill={getAQIColor(200)} fillOpacity={0.05} />
+              <ReferenceArea y1={200} y2={300} fill={getAQIColor(300)} fillOpacity={0.06} />
+              <ReferenceArea y1={300} y2={400} fill={getAQIColor(400)} fillOpacity={0.07} />
+              <ReferenceArea y1={400} y2={500} fill={getAQIColor(500)} fillOpacity={0.08} />
 
               {/* Multi-Line Data */}
               <Area 

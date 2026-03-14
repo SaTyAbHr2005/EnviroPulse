@@ -29,17 +29,6 @@ REGION_PROFILES = {
         "noise_db": (80, 100),
         "traffic_density": (65, 90)
     },
-    "Chandrapur": {
-        "pm25": (180, 280),
-        "pm10": (300, 450),
-        "no2": (90, 150),
-        "co": (3.0, 6.0),
-        "so2": (70, 130),
-        "o3": (110, 180),
-        "nh3": (50, 110),
-        "noise_db": (85, 110),
-        "traffic_density": (60, 85)
-    },
 
     # Moderate Baselines
     "Pune": {

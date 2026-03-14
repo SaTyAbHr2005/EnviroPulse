@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api import sensor_routes, analytics_routes, auth_routes, simulator_routes
+from backend.api import sensor_routes, analytics_routes, auth_routes, simulator_routes, hardware_routes
 from backend.config.database import engine, Base
 import backend.models.domain_models # Ensure models are loaded before create_all
 
@@ -29,6 +29,7 @@ app.include_router(sensor_routes.router)
 app.include_router(analytics_routes.router)
 app.include_router(auth_routes.router)
 app.include_router(simulator_routes.router)
+app.include_router(hardware_routes.router)
 
 @app.get("/")
 def read_root():

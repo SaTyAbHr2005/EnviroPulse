@@ -21,20 +21,20 @@ const Login = () => {
     if (isRegisterMode) {
       const result = await register(email, password);
       if (result.success) {
-        navigate('/admin');
+        navigate('/admin/control-panel');
       } else {
         setError(result.error);
       }
     } else {
       const result = await login(email, password);
       if (result.success) {
-        navigate('/admin');
+        navigate('/admin/control-panel');
       } else {
         // Automatically try to register admin demo account if it doesn't exist yet
         if (email === 'admin@enviropulse.com' && password === 'admin') {
            const regResult = await register(email, password);
            if (regResult.success) {
-              navigate('/admin');
+              navigate('/admin/control-panel');
               return;
            }
         }

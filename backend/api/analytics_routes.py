@@ -115,6 +115,59 @@ def get_latest_analytics(db: Session = Depends(get_db)):
 
     return results
 
+@router.get("/sensors-telemetry")
+def get_sensors_telemetry(db: Session = Depends(get_db)):
+    """
+    Returns detailed real-time telemetry and predictions for EVERY unique sensor node.
+    Used for rich map popups.
+    """
+    sensors = db.query(Sensor).filter(Sensor.status == 'active').all()
+    results = []
+
+    for sensor in sensors:
+        latest_reading = db.query(Reading).filter(Reading.sensor_id == sensor.id).order_by(Reading.timestamp.desc()).first()
+        
+        if not latest_reading:
+            continue
+
+        pollutants = {
+            "pm25": latest_reading.pm25,
+            "pm10": latest_reading.pm10,
+            "no2": latest_reading.no2,
+            "co": latest_reading.co,
+            "so2": latest_reading.so2,
+            "o3": latest_reading.o3,
+            "nh3": latest_reading.nh3
+        }
+        
+        # ML Predictions for this specific sensor
+        predicted_aqi = aqi_predictor.predict_aqi(pollutants)
+        predicted_noise = noise_predictor.predict_noise({"traffic_density": latest_reading.traffic_density})
+        
+        # Rules Engine for this specific sensor
+        stress = calculate_stress_index(predicted_aqi, predicted_noise, latest_reading.traffic_density)
+        cause = detect_pollution_cause(latest_reading.pm25, latest_reading.pm10, latest_reading.so2, latest_reading.traffic_density)
+        advisory = get_health_advisory(predicted_aqi)
+
+        results.append({
+            "id": sensor.id,
+            "sensor_name": sensor.sensor_name,
+            "district": sensor.district.name,
+            "latitude": sensor.latitude,
+            "longitude": sensor.longitude,
+            "aqi": predicted_aqi,
+            "noise_db": predicted_noise,
+            "stress_score": stress["score"],
+            "stress_category": stress["category"],
+            "cause": cause,
+            "health_advice": advisory["advice"],
+            "pollutants": pollutants,
+            "traffic_density": latest_reading.traffic_density,
+            "timestamp": latest_reading.timestamp
+        })
+
+    return results
+
 @router.get("/district/{district_name}")
 def get_district_analytics(district_name: str, db: Session = Depends(get_db)):
     """
@@ -125,8 +178,21 @@ def get_district_analytics(district_name: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="District not found")
         
     sensors = db.query(Sensor).filter(Sensor.district_id == district.id, Sensor.status == 'active').all()
+    
+    fallback_response = {
+        "district": district.name,
+        "timestamp": None,
+        "aqi": 0,
+        "noise_db": 0,
+        "stress_score": 0,
+        "stress_category": "Offline",
+        "cause": "Network Offline",
+        "health_advice": "No telemetry data available for this region.",
+        "pollutants": { "pm25": 0, "pm10": 0, "no2": 0, "co": 0, "so2": 0, "o3": 0, "nh3": 0 }
+    }
+
     if not sensors:
-        raise HTTPException(status_code=404, detail="No active sensors in this district")
+        return fallback_response
         
     count = 0
     pm25, pm10, no2, co, so2, o3, nh3, traffic_density = 0, 0, 0, 0, 0, 0, 0, 0
@@ -149,7 +215,7 @@ def get_district_analytics(district_name: str, db: Session = Depends(get_db)):
             latest_ts = reading.timestamp
             
     if count == 0:
-        raise HTTPException(status_code=404, detail="No readings available for this district")
+        return fallback_response
         
     pollutants = {
         "pm25": pm25 / count, "pm10": pm10 / count, "no2": no2 / count,
@@ -286,6 +352,56 @@ def predict_stress_custom(data: StressPredictionRequest):
         "aqi_prediction": predicted_aqi,
         "noise_prediction": predicted_noise,
         "stress_score": stress["score"],
-        "stress_category": stress["category"],
         "stress_action": stress["action"]
     }
+
+@router.get("/debug/sensors/{district_name}")
+def get_sensor_debug_telemetry(district_name: str, db: Session = Depends(get_db)):
+    """
+    Diagnostic endpoint to verify exact mathematical aggregation.
+    Returns every raw active sensor in the district and the resulting average.
+    """
+    district = db.query(District).filter(func.lower(District.name) == district_name.lower()).first()
+    if not district:
+        raise HTTPException(status_code=404, detail="District not found")
+        
+    sensors = db.query(Sensor).filter(Sensor.district_id == district.id, Sensor.status == 'active').all()
+    
+    sensor_data = []
+    total_aqi = 0
+    total_noise = 0
+    
+    for sensor in sensors:
+        reading = db.query(Reading).filter(Reading.sensor_id == sensor.id).order_by(Reading.timestamp.desc()).first()
+        if not reading: continue
+        
+        # Predict AQI for this specific sensor instance
+        pollutants = {
+            "pm25": reading.pm25, "pm10": reading.pm10, "no2": reading.no2,
+            "co": reading.co, "so2": reading.so2, "o3": reading.o3, "nh3": reading.nh3
+        }
+        sensor_aqi = aqi_predictor.predict_aqi(pollutants)
+        
+        # Predict Noise for this specific sensor instance
+        sensor_noise = noise_predictor.predict_noise({"traffic_density": reading.traffic_density})
+        
+        sensor_data.append({
+            "id": sensor.sensor_id,
+            "aqi": round(sensor_aqi),
+            "noise": round(sensor_noise)
+        })
+        
+        total_aqi += sensor_aqi
+        total_noise += sensor_noise
+        
+    count = len(sensor_data)
+    
+    return {
+        "city": district.name,
+        "sensors": sensor_data,
+        "aggregated": {
+            "aqi": round(total_aqi / count) if count > 0 else 0,
+            "noise": round(total_noise / count) if count > 0 else 0
+        }
+    }
+

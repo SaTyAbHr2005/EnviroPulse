@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from backend.config.database import get_db
-from backend.models.domain_models import Reading
+from backend.models.domain_models import Reading, User
 from backend.simulator import sensor_simulator
+from backend.api.auth_routes import get_current_admin
 
 router = APIRouter(
     prefix="/simulator",
@@ -12,7 +13,7 @@ router = APIRouter(
 )
 
 @router.post("/start")
-def start_simulation(background_tasks: BackgroundTasks):
+def start_simulation(background_tasks: BackgroundTasks, current_admin: User = Depends(get_current_admin)):
     """
     Starts the global synthetic sensor telemetry simulation loop in the background.
     """
@@ -27,7 +28,7 @@ def start_simulation(background_tasks: BackgroundTasks):
     return {"status": "Simulation started", "state": "Running"}
 
 @router.post("/stop")
-def stop_simulation():
+def stop_simulation(current_admin: User = Depends(get_current_admin)):
     """
     Gracefully halts the telemetry generation loop.
     """
@@ -38,7 +39,7 @@ def stop_simulation():
     return {"status": "Simulation stopping gracefully...", "state": "Stopped"}
 
 @router.get("/status")
-def get_simulation_status():
+def get_simulation_status(current_admin: User = Depends(get_current_admin)):
     """
     Returns Idle, Running, or Stopped.
     """
@@ -46,7 +47,7 @@ def get_simulation_status():
     return {"state": state_str}
 
 @router.get("/telemetry")
-def get_telemetry_stream(limit: int = 50, db: Session = Depends(get_db)):
+def get_telemetry_stream(limit: int = 50, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
     """
     Fetches the live tail of the telemetry readings table for the dashboard.
     """
@@ -72,7 +73,7 @@ def get_telemetry_stream(limit: int = 50, db: Session = Depends(get_db)):
     return stream
 
 @router.delete("/reset")
-def reset_database(db: Session = Depends(get_db)):
+def reset_database(db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
     """
     DANGER: Wipes all historical sensor telemetry data.
     Keeps the exact physical sensor nodes intact, just deletes the generated readings.

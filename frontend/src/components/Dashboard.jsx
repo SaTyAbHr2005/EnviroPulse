@@ -14,10 +14,15 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
+  const [sensorsData, setSensorsData] = useState([]);
+
   const fetchAnalytics = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/analytics/latest`);
-      const dataArray = response.data;
+      const [analyticsRes, sensorsRes] = await Promise.all([
+         axios.get(`${BACKEND_URL}/analytics/latest`),
+         axios.get(`${BACKEND_URL}/analytics/sensors-telemetry`)
+      ]);
+      const dataArray = analyticsRes.data;
       
       // Directly map the aggregated district blocks into the format the UI expects
       const districtsData = dataArray.map(district => ({
@@ -48,6 +53,7 @@ const Dashboard = () => {
       }));
       
       setData(districtsData);
+      setSensorsData(sensorsRes.data || []);
       setLastUpdated(dataArray.length > 0 ? new Date(dataArray[0].timestamp).toLocaleTimeString() : new Date().toLocaleTimeString());
       setError(null);
       setLoading(false);
@@ -101,10 +107,10 @@ const Dashboard = () => {
       {/* Top Level Metric Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Card 1: Overall Stress */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-sm dark:shadow-lg transition-colors">
           <div>
-            <p className="text-sm text-slate-400 font-medium">Avg. Stress Index</p>
-            <p className="text-3xl font-bold text-blue-400 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Avg. Stress Index</p>
+            <p className="text-3xl font-bold text-blue-500 dark:text-blue-400 mt-1">
               {data.length > 0 ? Math.round(data.reduce((sum, d) => sum + (d.sensors[0].rules?.stress_index || 0), 0) / data.length) : '--'}
             </p>
           </div>
@@ -112,10 +118,10 @@ const Dashboard = () => {
         </div>
 
         {/* Card 2: Average Noise */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-sm dark:shadow-lg transition-colors">
           <div>
-            <p className="text-sm text-slate-400 font-medium">Avg. Noise (dBA)</p>
-            <p className="text-3xl font-bold text-amber-400 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Avg. Noise (dBA)</p>
+            <p className="text-3xl font-bold text-amber-500 dark:text-amber-400 mt-1">
               {data.length > 0 ? (data.reduce((sum, d) => sum + d.sensors[0].predictions.predicted_noise_dba, 0) / data.length).toFixed(1) : '--'}
             </p>
           </div>
@@ -123,21 +129,21 @@ const Dashboard = () => {
         </div>
 
         {/* Card 3: Active Sensors */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-sm dark:shadow-lg transition-colors">
           <div>
-            <p className="text-sm text-slate-400 font-medium">Active Sensors</p>
-            <p className="text-3xl font-bold text-emerald-400 mt-1">{data.length}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Active Sensors</p>
+            <p className="text-3xl font-bold text-emerald-500 dark:text-emerald-400 mt-1">{sensorsData.length || data.length}</p>
           </div>
           <Activity className="w-8 h-8 text-emerald-500/70" />
         </div>
 
         {/* Card 4: Last Updated */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center justify-between shadow-sm dark:shadow-lg transition-colors">
           <div>
-            <p className="text-sm text-slate-400 font-medium">Last Sync</p>
-            <p className="text-xl font-bold text-slate-300 mt-1">{lastUpdated || 'Pending'}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Last Sync</p>
+            <p className="text-xl font-bold text-slate-700 dark:text-slate-300 mt-1">{lastUpdated || 'Pending'}</p>
           </div>
-          <Wind className="w-8 h-8 text-slate-500/70" />
+          <Wind className="w-8 h-8 text-slate-400 dark:text-slate-500/70" />
         </div>
       </div>
       
@@ -152,7 +158,7 @@ const Dashboard = () => {
       {/* GEO-SPATIAL MAP WIDGET */}
       <div className="mb-8 w-full h-[550px] lg:h-[650px] flex flex-col">
         {data.length > 0 ? (
-           <MapWidget data={data} />
+           <MapWidget data={data} sensors={sensorsData} />
         ) : (
            <div className="w-full h-full rounded-xl border border-slate-800 bg-slate-900/50 animate-pulse flex items-center justify-center">
              <span className="text-slate-500 font-mono text-sm tracking-widest">AWAITING SATELLITE TELEMETRY...</span>

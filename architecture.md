@@ -100,16 +100,17 @@ Enables standard HTTP fetching methodologies eliminating stateful WebSocket trac
 
 ---
 
-### Module 6 – Data Fetching & Dashboard Controller 🔜 (Next)
+### Module 6 – Data Fetching & Dashboard Controller ✅ (Completed)
 The front-end client interface processing incoming backend payloads.
 
 **Architecture:**
-- Initial layout definitions utilizing Vite, React, and Tailwind CSS.
-- Periodic polling utility (`setInterval` calling API every 3–5 seconds explicitly).
-- Central state manager routing context updates to modular cards natively without redundant renders.
+- **3-Zone Layout**: Orchestrated UI consisting of a persistent Sidebar, a 12-column Main Analytics Hub, and a dedicated Impact Intelligence Sidebar.
+- **SWR Data Pattern**: Implemented "Stale-While-Revalidate" logic via `useCityTelemetry` hook, ensuring instant UI responses with background data synchronization.
+- **Centralized Telemetry Store**: Global cache instance for persisting district data across navigation.
 
 **Benefits:**
-Simplistic integration simulating near-RT socket functionality with superior fault tolerance.
+- Eliminates UI flicker during data updates.
+- Decouples UI components from complex API orchestration.
 
 ---
 
@@ -117,19 +118,19 @@ Simplistic integration simulating near-RT socket functionality with superior fau
 Leaflet interactive map plotting dynamic sensory data over topological UI constraints.
 
 **Components:**
-- Leaflet map rendering District specific mapped bounds (Maharashtra).
-- Contextual OpenStreetMap SVG Markers reacting to local Environmental Stress Limits (Green/Yellow/Orange/Red).
-- Real-time interactable SVG popups loading deep insights dynamically based on Component Context.
+- Leaflet map rendering regional sensor markers.
+- Contextual status indicators reacting to local Environmental Stress levels.
+- Real-time interactable popups loading deep insights dynamically.
 
 ---
 
-### Module 8 – Advanced Analytics UI (Planned)
-Data-dense React Rechart widgets converting complex metrics into readable structures.
+### Module 8 – Advanced Analytics UI ✅ (Completed)
+Data-dense React components converting complex metrics into readable structures.
 
 **Features:**
-- Time-series progression charting.
-- Stress Level Gauges rendering 0-100 indexed severity curves visually.
-- Responsive flex-layouts gracefully displaying ML forethoughts alongside live updates.
+- **Impact Intelligence Hub**: Visualization of environmental stress on Agriculture, Wildlife, and Economy.
+- **Causal UI**: Dynamic iconography mapped to ML-detected pollution sources (Cars for traffic, Factories for industry).
+- **Leaderboard System**: Top polluted regions tracker aggregated from the entire sensor network.
 
 ---
 
@@ -155,6 +156,6 @@ Future tools to extend capability:
 | Module 3 – ML Prediction Engine | ✅ Completed |
 | Module 4 – Environmental Rules Engine | ✅ Completed |
 | Module 5 – Backend Results API | ✅ Completed |
-| Module 6 – Data Fetching & UI Controller | 🔜 Next |
+| Module 6 – Data Fetching & UI Controller | ✅ Completed |
 | Module 7 – Geo-Spatial Visualization Layer | ✅ Completed |
-| Module 8 – Advanced Analytics UI | Planned |
+| Module 8 – Advanced Analytics UI | ✅ Completed |

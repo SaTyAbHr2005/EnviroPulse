@@ -74,13 +74,14 @@ The gateway providing near real-time data back to the frontend without WebSocket
 
 ---
 
-### Module 6 – Data Fetching & Dashboard Controller 🔜 (Next)
+### Module 6 – Data Fetching & Dashboard Controller ✅ (Completed)
 The React controller governing constant state updates.
 
 **Features:**
-- Initial layout definitions using Tailwind CSS.
-- Periodic polling utility (`setInterval` calling API every 3–5 seconds).
-- Distributes polling results into reusable React component contexts.
+- Professional 3-zone layout (Sidebar, Analytics Hub, Impact Intelligence).
+- Centralized telemetry store using Stale-While-Revalidate (SWR) pattern.
+- High-frequency polling (every 3 seconds) for real-time sensor updates.
+- Responsive 12-column grid system for modular analytics cards.
 
 ---
 
@@ -88,20 +89,20 @@ The React controller governing constant state updates.
 The interactive map plotting sensor metadata.
 
 **Features:**
-- Leaflet + OpenStreetMap engine.
-- District specific mapped boundaries for Maharashtra.
+- Leaflet + OpenStreetMap engine integration.
 - Contextual Markers that react to local AQI limits (Green/Yellow/Red).
-- Real-time tooltips providing live reading insights on user click interactability.
+- Real-time tooltips providing live reading insights on user interaction.
 
 ---
 
-### Module 8 – Advanced Analytics UI (Planned)
+### Module 8 – Advanced Analytics UI ✅ (Completed)
 The statistical visualization dashboard components.
 
 **Features:**
-- Uses Recharts for advanced pollution progression graphs.
-- Stress Level Gauges displaying ESI out of 100.
-- Summary Cards tracking the AQI forecasting outputs for the next immediate hours.
+- **Impact Intelligence**: Sector-level impact derivation (Agriculture, Tourism, Wildlife, Health, Economy).
+- **Dynamic Source Detection**: ML-driven identification of pollution sources (Traffic, Industrial, etc.) with high-fidelity iconography.
+- **Regional Rankings**: Real-time "Top Polluted Regions" leaderboard across Maharashtra.
+- **Health Advisories**: Dynamic atmospheric alerts and safety recommendations.
 
 ---
 
@@ -125,19 +126,19 @@ EnviroPulse operates primarily on a pull-based asynchronous architecture.
 | Module 3 – ML Prediction Engine | ✅ Completed |
 | Module 4 – Environmental Rules Engine | ✅ Completed |
 | Module 5 – Backend Results API | ✅ Completed |
-| Module 6 – Data Fetching & UI Controller | 🔜 Next |
+| Module 6 – Data Fetching & UI Controller | ✅ Completed |
 | Module 7 – Geo-Spatial Visualization Layer | ✅ Completed |
-| Module 8 – Advanced Analytics UI | Planned |
+| Module 8 – Advanced Analytics UI | ✅ Completed |
 
 ---
 
 ## Example Usage Pipeline
-1. `sensor_simulator.py` initializes virtual sensors for Mumbai and Pune.
-2. Every 30s it drops new pollutant strings into the PostgreSQL `readings` table.
+1. `sensor_simulator.py` initializes virtual sensors for Maharashtra districts.
+2. Every few seconds it drops new pollutant data into the PostgreSQL `readings` table.
 3. A user visits the React dashboard.
-4. The dashboard makes an automatic fetch every 5s to `GET /analytics/latest`.
-5. FastAPI triggers ML predictions & Rules calculating Stress levels against the newest SQL records dynamically based on the polling fetch.
-6. The user immediately visualizes the live state update.
+4. The dashboard makes an automatic fetch every 3s via `useCityTelemetry`.
+5. FastAPI triggers ML predictions & Rules calculating Stress levels and identifying pollution causes.
+6. The user visualizes the results through a modern, 3-zone intelligence interface.
 
 ## License
 Distributed under the MIT License.

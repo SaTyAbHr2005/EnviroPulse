@@ -11,7 +11,14 @@ import {
    MapPin,
    TrendingUp,
    ShieldAlert,
-   Droplets
+   Droplets,
+   Car,
+   Factory,
+   HardHat,
+   Flame,
+   Building2,
+   CloudRain,
+   AlertCircle
 } from 'lucide-react';
 
 const BACKEND_URL = 'http://localhost:8000';
@@ -27,6 +34,15 @@ const MainDashboard = () => {
    // Use centralized telemetry store (SWR pattern)
    const { data: regionData, topPolluted, loading } = useCityTelemetry(selectedDistrict);
 
+   const getSourceConfig = (src) => {
+      const s = src?.toLowerCase() || '';
+      if (s.includes('traffic') || s.includes('vehicle')) return { icon: Car, color: '#A855F7', label: 'Vehicular Emissions', bg: 'bg-purple-500/10' };
+      if (s.includes('industrial') || s.includes('factory')) return { icon: Factory, color: '#F97316', label: 'Industrial Output', bg: 'bg-orange-500/10' };
+      if (s.includes('construction')) return { icon: HardHat, color: '#EAB308', label: 'Site Activity', bg: 'bg-yellow-500/10' };
+      if (s.includes('waste') || s.includes('burning')) return { icon: Flame, color: '#EF4444', label: 'Combustion', bg: 'bg-red-500/10' };
+      if (s.includes('commercial')) return { icon: Building2, color: '#3B82F6', label: 'Commercial Zone', bg: 'bg-blue-500/10' };
+      return { icon: CloudRain, color: '#6366F1', label: 'Atmospheric Mix', bg: 'bg-indigo-500/10' };
+   };
 
    // Render loading state ONLY if we don't even have a cache hit
    if (loading && !regionData) {
@@ -41,6 +57,7 @@ const MainDashboard = () => {
    }
 
    const { pollutants, stress_score, aqi, noise_db, cause, health_advice } = regionData;
+   const { icon: SourceIcon, color: sourceColor, label: sourceLabel, bg: sourceBg } = getSourceConfig(cause);
 
    // Derive Impact percentages based on stress score
    const impacts = {
@@ -159,12 +176,19 @@ const MainDashboard = () => {
                </div>
 
                {/* Pollution Source */}
-               <div className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 rounded-2xl p-6 flex flex-col relative overflow-hidden shadow-sm dark:shadow-lg transition-colors">
+               <div className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 rounded-2xl p-6 flex flex-col relative overflow-hidden shadow-sm dark:shadow-lg transition-colors group">
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent z-0"></div>
-                  <h3 className="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest mb-auto z-10 flex items-center gap-2"><Droplets size={14} className="text-indigo-400" /> POLLUTION SOURCE</h3>
-                  <div className="z-10 mt-6">
-                     <p className="text-xs text-indigo-500 dark:text-indigo-400 font-bold uppercase tracking-wider mb-1">Detected Source</p>
-                     <p className="text-xl font-black text-slate-900 dark:text-white leading-tight">{cause}</p>
+                  <h3 className="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest mb-auto z-10 flex items-center gap-2"><AlertCircle size={14} className="text-indigo-400" /> POLLUTION SOURCE</h3>
+                  
+                  <div className="flex-1 flex flex-col items-center justify-center gap-3 z-10 mt-2">
+                     <div className={`relative w-24 h-24 rounded-full ${sourceBg} flex items-center justify-center border border-white/5 shadow-xl group-hover:scale-105 transition-transform duration-500`}>
+                        <SourceIcon size={40} style={{ color: sourceColor }} className="drop-shadow-sm" />
+                     </div>
+                     
+                     <div className="text-center">
+                        <p className="text-[10px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-1">{sourceLabel}</p>
+                        <p className="text-xl font-black text-slate-900 dark:text-white leading-tight uppercase">{cause}</p>
+                     </div>
                   </div>
                </div>
             </div>
@@ -203,7 +227,7 @@ const MainDashboard = () => {
                   <MapPin size={14} className="text-rose-500" /> TOP POLLUTED REGIONS – MAHARASHTRA
                </h3>
                <div className="flex flex-wrap gap-3">
-                  {topPolluted.length > 0 ? topPolluted.map((reg, idx) => (
+                  {topPolluted?.length > 0 ? topPolluted.map((reg, idx) => (
                      <div key={reg.name} className="flex-1 min-w-[140px] bg-slate-50 dark:bg-[#1e293b]/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 flex flex-col relative transition-colors">
                         <span className="absolute top-3 left-3 text-[10px] font-black text-slate-400 dark:text-slate-600">#{idx + 1}</span>
                         <span className="text-center font-bold text-slate-700 dark:text-slate-300 text-sm mb-1">{reg.name}</span>

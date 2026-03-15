@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Play, Square, RotateCcw, Activity, Terminal, Server } from 'lucide-react';
 import { getNoiseColor } from '../utils/metricColors';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const AdminSimulator = () => {
   const [SystemStatus, setSystemStatus] = useState('Idle');

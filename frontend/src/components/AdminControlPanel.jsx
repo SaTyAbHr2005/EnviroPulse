@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Cpu, Power, PowerOff, ShieldAlert, PlusCircle, Trash2 } from 'lucide-react';
 import DeployNodeModal from './DeployNodeModal';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const AdminControlPanel = () => {
 

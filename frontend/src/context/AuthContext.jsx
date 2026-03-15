@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -32,7 +33,7 @@ export const AuthProvider = ({ children }) => {
             formData.append('username', email); // OAuth2 expects 'username' field
             formData.append('password', password);
 
-            const res = await axios.post('http://localhost:8000/auth/login', formData, {
+            const res = await axios.post(`${BACKEND_URL}/auth/login`, formData, {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
             
@@ -50,7 +51,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (email, password) => {
         try {
-            const res = await axios.post('http://localhost:8000/auth/register', {
+            const res = await axios.post(`${BACKEND_URL}/auth/register`, {
                 email,
                 password,
                 role: "admin" // We force role to admin for this exercise setup

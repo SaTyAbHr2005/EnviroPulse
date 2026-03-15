@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:13
+    container_name: enviropulse_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Satya@2005}
+      POSTGRES_DB: enviropulse
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: enviropulse_backend
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://postgres:Satya%402005@db:5432/enviropulse
+      - SECRET_KEY=${SECRET_KEY:-yoursecretkeyhere_for_jwt_later}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

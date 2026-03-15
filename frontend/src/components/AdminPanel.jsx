@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Server, Play, Square, Trash2, Plus, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const AdminPanel = () => {
   const [sensors, setSensors] = useState([]);

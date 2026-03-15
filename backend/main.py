@@ -17,7 +17,13 @@ app.add_middleware(
         "http://127.0.0.1:5173", 
         "http://localhost:5174", 
         "http://127.0.0.1:5174", 
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://enviropulse-react-frontend.s3-website.eu-north-1.amazonaws.com",
+        "https://enviropulse-react-frontend.s3-website.eu-north-1.amazonaws.com",
+        "http://enviropulse-react-frontend.s3-website-eu-north-1.amazonaws.com",
+        "https://enviropulse-react-frontend.s3-website-eu-north-1.amazonaws.com",
+        "http://enviropulse-react-frontend.s3.eu-north-1.amazonaws.com",
+        "https://enviropulse-react-frontend.s3.eu-north-1.amazonaws.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],

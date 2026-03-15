@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useRegion } from '../context/RegionContext';
 import { MapPin, Activity, RefreshCw } from 'lucide-react';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const RegionSelector = () => {
   const navigate = useNavigate();

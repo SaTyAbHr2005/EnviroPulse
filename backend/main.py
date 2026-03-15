@@ -12,19 +12,7 @@ app = FastAPI(title="EnviroPulse API", version="1.0.0")
 # Configure CORS for localhost React app
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173", 
-        "http://127.0.0.1:5173", 
-        "http://localhost:5174", 
-        "http://127.0.0.1:5174", 
-        "http://localhost:3000",
-        "http://enviropulse-react-frontend.s3-website.eu-north-1.amazonaws.com",
-        "https://enviropulse-react-frontend.s3-website.eu-north-1.amazonaws.com",
-        "http://enviropulse-react-frontend.s3-website-eu-north-1.amazonaws.com",
-        "https://enviropulse-react-frontend.s3-website-eu-north-1.amazonaws.com",
-        "http://enviropulse-react-frontend.s3.eu-north-1.amazonaws.com",
-        "https://enviropulse-react-frontend.s3.eu-north-1.amazonaws.com"
-    ],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,3 +32,4 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+

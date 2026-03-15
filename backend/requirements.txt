@@ -5,7 +5,8 @@ psycopg2-binary
 pydantic
 pydantic-settings
 python-jose[cryptography]
-passlib[bcrypt]
+passlib[bcrypt]==1.7.4
+bcrypt==3.1.7
 catboost
 xgboost
 pandas

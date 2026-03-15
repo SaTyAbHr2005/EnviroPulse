@@ -33,8 +33,6 @@ const RegionSelector = () => {
     };
 
     fetchDistricts();
-    const interval = setInterval(fetchDistricts, 5000); // Dynamic update on selector too
-    return () => clearInterval(interval);
   }, []);
 
   const getStatusFromAQI = (aqi) => {

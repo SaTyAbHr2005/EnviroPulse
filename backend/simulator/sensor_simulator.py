@@ -8,6 +8,13 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
+import os
+
+# Explicitly load .env from the project root
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+load_dotenv(os.path.join(project_root, ".env"))
+
 from backend.config.database import SessionLocal, engine
 from backend.models.domain_models import Base, District, Sensor, Reading
 from backend.simulator.region_profiles import REGION_PROFILES

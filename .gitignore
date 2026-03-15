@@ -34,14 +34,14 @@ htmlcov/
 .env.*.local
 *.env
 
-# Node.js
+# Node.js & Logs
 node_modules/
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-frontend/node_modules/
-frontend/dist/
 
 # IDE & OS
 .vscode/
@@ -59,7 +59,30 @@ backend/api/__pycache__/
 backend/rules/__pycache__/
 backend/simulator/__pycache__/
 
+# Frontend-Specific
+frontend/dist/
+frontend/dist-ssr/
+frontend/node_modules/
+
+# Visual Studio & Windows
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+Thumbs.db
+desktop.ini
+
 # Keep ML Models as requested in previous sessions
 !backend/models/*.pkl
 !backend/models/*.png
 !backend/models/*.joblib
+
+# Test & Utility Files (Local only)
+test_db_connection.py
+test_integration.py
+test_ml.py
+error.log
+backend/db_fix_coords.py
+backend/db_migrate.py
+backend/standardize_sensors.py

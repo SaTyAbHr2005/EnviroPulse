@@ -1,144 +1,308 @@
-# EnviroPulse – Urban Environmental Intelligence Platform
+# EnviroPulse: Urban Environmental Intelligence Grid
+
+EnviroPulse is a full-stack smart-city intelligence platform that simulates decentralized sensor infrastructure, predicts air-quality dynamics with machine learning, and delivers actionable environmental insights through a real-time analytics dashboard.
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![Python: 3.9+](https://img.shields.io/badge/Python-3.9+-green.svg)
-![React: 18+](https://img.shields.io/badge/React-18+-61dafb.svg)
+![Python](https://img.shields.io/badge/Python-3.11+-green.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688.svg)
+![React](https://img.shields.io/badge/React-19.x-61dafb.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-336791.svg)
+![Vite](https://img.shields.io/badge/Vite-8.x-646CFF.svg)
 
-## Project Introduction
-**EnviroPulse** is a professional-grade full-stack environmental intelligence platform. It simulates district-wise environmental sensors continuously streaming telemetry data (PM2.5, NO2, traffic noise, etc.). A predictive analytical backend infers actionable Health Action Advisories and a customized *Environmental Stress Index (ESI)*, which is dynamically fetched by a React dashboard periodically.
+## Overview
 
----
+EnviroPulse models a city as a living environmental system. Virtual district sensors continuously stream pollutant, traffic, and acoustic telemetry into a relational backend. The platform then combines ML inference, aggregation logic, and rule-based intelligence to produce:
 
-## 🏗️ Modules Breakdown
+- Live AQI and noise signals
+- Environmental Stress Index (ESI)
+- Source/cause diagnostics
+- Health advisory guidance
+- District-level and sensor-level geospatial intelligence
 
-### Module 1 – Initialization & Database Setup ✅ (Completed)
-This module acts as the foundation for storing simulated state and real-time telemetry.
+It is built for both citizen awareness and administrative operations.
 
-**Features:**
-- Define hierarchical schema (State -> District -> Sensors)
-- Define Readings schema
-- Setup FastAPI and React Vite Boilerplates
-- Provide initial `schema.sql` template
+## Core Features
 
-**Outcome Structure:**
-PostgreSQL instance running with structured normalized tables ready for injection.
+### 1) Decentralized Sensor Simulation Layer
 
----
+- Synthetic telemetry generation for multiple districts and zone types.
+- Sensor identity strategy (district prefixes + numbered nodes).
+- Event-driven anomaly bursts (traffic surge, industrial events, dust conditions).
+- Start/stop/reset simulator controls via API and admin UI.
 
-### Module 2 – Sensor Simulation Engine ✅ (Completed)
-This module generates continuous dynamic telemetry.
+### 2) Real-Time Environmental Analytics Engine
 
-**Purpose:**
-A standalone script that behaves like hardware IoT district-nodes. It operates on a timer and continuously injects records directly into the local database instance.
+- Latest district-wide aggregation endpoint.
+- District-specific analytics endpoint with fallback behavior when telemetry is missing.
+- Rich per-sensor telemetry endpoint for map and popup intelligence.
+- Top-polluted regional ranking endpoint.
+- District history timeline endpoint optimized for chart rendering.
 
-**Example Payload Structure:**
-```json
-{
-   "district": "Pune",
-   "sensor_id": 2,
-   "pm25": 140.2,
-   "traffic_density": 65,
-   "timestamp": "2023-08-14T10:00:00Z"
-}
+### 3) Machine Learning Prediction Stack
+
+- AQI prediction pipeline using pretrained model artifacts when present.
+- Noise prediction pipeline using traffic-aware model inputs.
+- AQI forecast capability for forward trend projection.
+- Graceful fallback heuristics if model files are unavailable.
+
+### 4) Environmental Rules and Decision Layer
+
+- Environmental Stress Index computation from AQI, noise, and traffic.
+- Cause detection for likely pollution sources.
+- Health advisory mapping based on severity thresholds.
+- Combined ML + rules response payloads for frontend consumption.
+
+### 5) Secure Admin and Access Control
+
+- JWT-based authentication for protected actions.
+- First-user bootstrap convenience with admin role assignment.
+- Protected administrative sensor operations.
+- Secure simulator control endpoints restricted to admin users.
+
+### 6) Intelligent Admin Operations Console
+
+- Deploy new hardware-style nodes into districts.
+- Toggle node status (active/inactive).
+- Remove decommissioned nodes.
+- View node-level status and geolocation details.
+- Control telemetry simulation lifecycle in real time.
+
+### 7) Interactive Frontend Intelligence Experience
+
+- Public landing flow and region selection.
+- Main dashboard with AQI/noise/stress KPI cards.
+- Top-polluted district leaderboard.
+- Pollutant concentration snapshots.
+- Manual stress prediction interface for custom scenario analysis.
+- Trends and map visualization modules powered by API telemetry.
+
+### 8) Data and Infrastructure Foundation
+
+- PostgreSQL relational schema for users, districts, sensors, readings.
+- SQLAlchemy ORM model layer with entity relationships.
+- Docker Compose support for backend + database orchestration.
+- Local and containerized run modes.
+
+## Architecture and Data Flow
+
+1. Edge Telemetry Simulation
+   Virtual sensors generate district-level atmospheric and traffic data.
+2. Ingestion and Persistence
+   FastAPI writes readings to PostgreSQL via SQLAlchemy models.
+3. Intelligence Computation
+   Aggregation + ML inference + rules engine derive environmental risk signals.
+4. API Distribution
+   Structured JSON endpoints expose latest state, history, rankings, and forecasts.
+5. Client Visualization
+   React UI renders maps, dashboards, trends, and advisory intelligence.
+
+```text
+Sensor Simulator / Hardware Deploy
+               |
+               v
+        PostgreSQL (readings)
+               |
+               v
+      FastAPI Analytics Layer
+       |        |          |
+       |        |          +-> Rules (stress, cause, advisory)
+       |        +-> ML (AQI, noise, forecast)
+       +-> Auth/Admin controls
+               |
+               v
+        React Intelligence UI
 ```
 
----
+## Full Feature Inventory
 
-### Module 3 – ML Prediction Engine ✅ (Completed)
-Handles predictions for AQI and Noise levels using pre-trained regression models.
+### Backend API capabilities
 
-**Outputs:**
-- CatBoost multi-variate AQI inference.
-- XGBoost inference logic for Noise generation based on simulated traffic density.
-- CatBoost Forecast for the next 1-6 hour AQI trend.
+- Health and root status endpoints.
+- Authentication endpoints (register/login).
+- Sensor CRUD and status control endpoints.
+- Hardware deployment and district lookup endpoints.
+- Simulator lifecycle and telemetry tail endpoints.
+- Analytics suite:
+  - Latest district analytics
+  - District analytics by name
+  - District history
+  - Sensor-level telemetry
+  - Top polluted districts
+  - AQI forecast
+  - Manual stress prediction
+  - Debug sensor aggregation endpoint
 
----
+### Frontend modules present
 
-### Module 4 – Environmental Rules Engine ✅ (Completed)
-Calculates causal metrics based on pollution logic.
+- Landing page
+- Region selector
+- Main dashboard
+- Map widget/dashboard
+- Trends dashboard
+- Stress prediction page
+- Admin login flow
+- Admin control panel
+- Admin simulator controls
+- Layout, sidebar, header, protected route, and context providers
 
-**Functions:**
-- **Stress Calculator**: Computes *Environmental Stress Index* based on normalized AQI, Noise, and Traffic.
-- **Pollution Causal Detector**: Matches specific conditions to environmental causes (e.g. High PM2.5 + Traffic = Vehicle Emissions).
-- **Health Advisory**: Triggers actionable recommendations based on CPCB threshold maps.
+### Intelligence models and scripts
 
----
+- AQI predictor
+- Noise predictor
+- Forecast support in AQI predictor
+- Training/validation scripts for data checks and model training workflows
 
-### Module 5 – Backend Results API ✅ (Completed)
-The gateway providing near real-time data back to the frontend without WebSockets.
+## Technology Stack
 
-**Endpoints:**
-- `GET /analytics/latest`: Core polling endpoint returning the latest district-wise sensor states, predictions, and health advisories.
-- `GET /sensors`: Initial mapping configuration.
-- `GET /health`: Standard sanity check endpoint.
+- Frontend: React 19, Vite, Tailwind CSS, Axios, React Router, Recharts, Leaflet, Lucide
+- Backend: Python, FastAPI, SQLAlchemy, Pydantic
+- Authentication: OAuth2 password flow, JWT, Passlib bcrypt
+- ML/Data: CatBoost, XGBoost, scikit-learn, pandas
+- Database: PostgreSQL, psycopg2-binary
+- Runtime/Infra: Docker Compose, Uvicorn
 
----
+## Repository Map
 
-### Module 6 – Data Fetching & Dashboard Controller ✅ (Completed)
-The React controller governing constant state updates.
+```text
+EnviroPulse/
+|- backend/
+|  |- api/                  # analytics_routes, auth_routes, simulator_routes, hardware_routes, sensor_routes
+|  |- auth/                 # jwt_handler
+|  |- config/               # database connection and session factory
+|  |- ml/                   # aqi_predictor, noise_predictor
+|  |- models/               # SQLAlchemy entities
+|  |- rules/                # stress_calculator, cause_detector, health_advisory
+|  |- simulator/            # region profiles and sensor simulator engine
+|  |- training/scripts/     # training, cleaning, and validation scripts
+|  |- main.py               # FastAPI app bootstrap
+|- database/schema.sql      # relational schema + district seed
+|- init_db.py               # bootstrap helper
+|- frontend/
+|  |- src/components/       # UI screens and dashboards
+|  |- src/context/          # auth and region context
+|  |- src/hooks/            # telemetry data hook
+|- docker-compose.yml
+|- test_ml.py
+|- test_integration.py
+```
 
-**Features:**
-- Professional 3-zone layout (Sidebar, Analytics Hub, Impact Intelligence).
-- Centralized telemetry store using Stale-While-Revalidate (SWR) pattern.
-- High-frequency polling (every 3 seconds) for real-time sensor updates.
-- Responsive 12-column grid system for modular analytics cards.
+## Quick Start
 
----
+### Prerequisites
 
-### Module 7 – Geo-Spatial Visualization Layer ✅ (Completed)
-The interactive map plotting sensor metadata.
+- Python 3.11+
+- Node.js 18+
+- npm
+- PostgreSQL 13+ (for local non-Docker mode)
+- Docker + Docker Compose (recommended)
 
-**Features:**
-- Leaflet + OpenStreetMap engine integration.
-- Contextual Markers that react to local AQI limits (Green/Yellow/Red).
-- Real-time tooltips providing live reading insights on user interaction.
+### Environment Variables
 
----
+Create .env in project root:
 
-### Module 8 – Advanced Analytics UI ✅ (Completed)
-The statistical visualization dashboard components.
+```env
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/enviropulse
+JWT_SECRET_KEY=replace_with_a_long_random_secret
+VITE_API_URL=http://localhost:8000
+POSTGRES_PASSWORD=your_password
+```
 
-**Features:**
-- **Impact Intelligence**: Sector-level impact derivation (Agriculture, Tourism, Wildlife, Health, Economy).
-- **Dynamic Source Detection**: ML-driven identification of pollution sources (Traffic, Industrial, etc.) with high-fidelity iconography.
-- **Regional Rankings**: Real-time "Top Polluted Regions" leaderboard across Maharashtra.
-- **Health Advisories**: Dynamic atmospheric alerts and safety recommendations.
+### Option A: Docker (Backend + DB)
 
----
+```bash
+docker compose up --build
+python init_db.py
+```
 
-## Execution Modes
-EnviroPulse operates primarily on a pull-based asynchronous architecture.
-### Simulated Synthetic Mode (Current)
-- Scans districts via synthetic sensor generator running internally.
-- Pushes continuous reading streams to PostgreSQL.
+### Option B: Local Runtime
 
-### Real Hardware Polling (Future Scope)
-- Actual IoT ESP32 nodes act directly as the data pipeline, dropping internal software generators.
+Backend:
 
----
+```bash
+pip install -r backend/requirements.txt
+python init_db.py
+uvicorn backend.main:app --reload --port 8000
+```
 
-## Current Project Status
+Frontend:
 
-| Module | Status |
-|--------|--------|
-| Module 1 – Initialization & Database Setup | ✅ Completed |
-| Module 2 – Sensor Simulation Engine | ✅ Completed |
-| Module 3 – ML Prediction Engine | ✅ Completed |
-| Module 4 – Environmental Rules Engine | ✅ Completed |
-| Module 5 – Backend Results API | ✅ Completed |
-| Module 6 – Data Fetching & UI Controller | ✅ Completed |
-| Module 7 – Geo-Spatial Visualization Layer | ✅ Completed |
-| Module 8 – Advanced Analytics UI | ✅ Completed |
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
----
+## API Surface
 
-## Example Usage Pipeline
-1. `sensor_simulator.py` initializes virtual sensors for Maharashtra districts.
-2. Every few seconds it drops new pollutant data into the PostgreSQL `readings` table.
-3. A user visits the React dashboard.
-4. The dashboard makes an automatic fetch every 3s via `useCityTelemetry`.
-5. FastAPI triggers ML predictions & Rules calculating Stress levels and identifying pollution causes.
-6. The user visualizes the results through a modern, 3-zone intelligence interface.
+Base URL: http://localhost:8000
+
+### General
+
+- GET /
+- GET /health
+
+### Auth
+
+- POST /auth/register
+- POST /auth/login
+
+### Sensors
+
+- GET /sensors/
+- POST /sensors/ (admin)
+- GET /sensors/{sensor_id}
+- DELETE /sensors/{sensor_id} (admin)
+- PUT /sensors/{sensor_id}/status (admin)
+
+### Hardware
+
+- POST /hardware/deploy
+- GET /hardware/districts
+
+### Simulator
+
+- POST /simulator/start (admin)
+- POST /simulator/stop (admin)
+- GET /simulator/status (admin)
+- GET /simulator/telemetry (admin)
+- DELETE /simulator/reset (admin)
+
+### Analytics
+
+- GET /analytics/latest
+- GET /analytics/district/{district_name}
+- GET /analytics/history/{district_name}
+- GET /analytics/sensors-telemetry
+- GET /analytics/top-polluted
+- GET /analytics/forecast
+- POST /analytics/predict-stress
+- GET /analytics/debug/sensors/{district_name}
+
+## Validation and Testing
+
+Run from repository root:
+
+```bash
+python test_ml.py
+python test_integration.py
+```
+
+Note: test_integration.py points to port 8080 by default.
+
+## Operational Notes
+
+- First registered user is auto-assigned admin role.
+- Model files are optional for development; fallback inference keeps workflows functional.
+- If local frontend requests fail due to browser CORS restrictions, update allow_origins in backend/main.py for your local frontend origin.
+
+## Future Expansion Paths
+
+1. Real IoT sensor ingestion pipeline (ESP32/edge devices).
+2. Alert broadcasting (email/SMS/push) on critical thresholds.
+3. Advanced anomaly detection for atypical emission signatures.
+4. Mobile client applications for wider citizen reach.
+5. Multi-state expansion with broader meteorological fusion.
 
 ## License
-Distributed under the MIT License.
+
+Licensed under MIT. See LICENSE for details.

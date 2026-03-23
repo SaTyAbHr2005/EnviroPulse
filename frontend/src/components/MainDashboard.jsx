@@ -56,6 +56,18 @@ const MainDashboard = () => {
       );
    }
 
+   if (!regionData) {
+      return (
+         <div className="flex w-full min-h-screen items-center justify-center font-sans">
+            <div className="flex flex-col items-center">
+               <AlertCircle className="text-rose-500 w-10 h-10 mb-4" />
+               <p className="text-slate-400 font-medium uppercase">No data available for {selectedDistrict}</p>
+               <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg">Retry</button>
+            </div>
+         </div>
+      );
+   }
+
    const { pollutants, stress_score, aqi, noise_db, cause, health_advice } = regionData;
    const { icon: SourceIcon, color: sourceColor, label: sourceLabel, bg: sourceBg } = getSourceConfig(cause);
 

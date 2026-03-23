@@ -18,6 +18,75 @@ router = APIRouter(
     tags=["analytics"]
 )
 
+@router.get("/history/{district_name}")
+def get_district_history(district_name: str, db: Session = Depends(get_db)):
+    """
+    Returns the last 24 hours of aggregated environmental trajectory for a specific district.
+    """
+    district = db.query(District).filter(func.lower(District.name) == district_name.lower()).first()
+    if not district:
+        print(f"DEBUG: History lookup failed - District not found: {district_name}")
+        raise HTTPException(status_code=404, detail="District not found")
+        
+    sensors = db.query(Sensor).filter(Sensor.district_id == district.id, Sensor.status == 'active').all()
+    if not sensors:
+        return []
+        
+    sensor_ids = [s.id for s in sensors]
+    
+    from datetime import datetime
+    
+    # We aggregate by time buckets to avoid overwhelming the graph
+    readings = db.query(Reading).filter(
+        Reading.sensor_id.in_(sensor_ids)
+    ).order_by(Reading.timestamp.desc()).limit(100).all()
+    
+    timeline = {}
+    for r in readings:
+        ts_str = r.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        if ts_str not in timeline:
+            timeline[ts_str] = {
+                "pm25": 0, "pm10": 0, "no2": 0, "co": 0, "so2": 0, "o3": 0, "nh3": 0,
+                "traffic_density": 0, "noise_db": 0, "count": 0, "timestamp": ts_str
+            }
+        
+        t = timeline[ts_str]
+        t["pm25"] += r.pm25
+        t["pm10"] += r.pm10
+        t["no2"] += r.no2
+        t["co"] += r.co
+        t["so2"] += r.so2
+        t["o3"] += r.o3
+        t["nh3"] += r.nh3
+        t["traffic_density"] += r.traffic_density
+        t["noise_db"] += r.noise_db
+        t["count"] += 1
+        
+    history_data = []
+    for ts, data in sorted(timeline.items()):
+        count = data["count"]
+        pollutants = {
+            "pm25": data["pm25"] / count, "pm10": data["pm10"] / count, "no2": data["no2"] / count,
+            "co": data["co"] / count, "so2": data["so2"] / count, "o3": data["o3"] / count, "nh3": data["nh3"] / count
+        }
+        avg_traffic = data["traffic_density"] / count
+        avg_noise = data["noise_db"] / count
+        
+        predicted_aqi = aqi_predictor.predict_aqi(pollutants)
+        stress = calculate_stress_index(predicted_aqi, avg_noise, avg_traffic)
+        
+        history_data.append({
+            "time": datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").strftime("%I:%M %p"),
+            "aqi": round(predicted_aqi),
+            "stress": round(stress["score"]),
+            "noise": round(avg_noise),
+            "pm25": round(pollutants["pm25"]),
+            "pm10": round(pollutants["pm10"])
+        })
+        
+    return history_data
+ 
+
 @router.get("/latest")
 def get_latest_analytics(db: Session = Depends(get_db)):
     """
@@ -197,8 +266,10 @@ def get_district_analytics(district_name: str, db: Session = Depends(get_db)):
     """
     Returns the aggregated real-time analytics for a specific district.
     """
+    print(f"DEBUG: Looking up district: '{district_name}'")
     district = db.query(District).filter(func.lower(District.name) == district_name.lower()).first()
     if not district:
+        print(f"DEBUG: District NOT FOUND: '{district_name}'")
         raise HTTPException(status_code=404, detail="District not found")
         
     sensors = db.query(Sensor).filter(Sensor.district_id == district.id, Sensor.status == 'active').all()

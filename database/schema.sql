@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS sensors (
     district_id INT REFERENCES districts(id) ON DELETE CASCADE,
     latitude FLOAT,
     longitude FLOAT,
+    coverage_radius INTEGER,
     status VARCHAR(20) DEFAULT 'active', -- 'active' or 'inactive'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

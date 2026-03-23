@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, TrendingUp, Map as MapIcon, PlayCircle, ShieldAlert, Activity, Server, Cpu, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getStressColor } from '../utils/metricColors';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [topRegion, setTopRegion] = useState(null);
+
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/analytics/top-polluted`)
+      .then(r => r.json())
+      .then(data => { if (data?.length) setTopRegion(data[0]); })
+      .catch(() => {});
+  }, []);
 
   const publicMenuItems = [
     { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: '/dashboard' },
@@ -62,12 +72,12 @@ const Sidebar = () => {
             </div>
             <div className="p-3 bg-white/50 dark:bg-slate-900/50 transition-colors">
               <div className="flex justify-between items-end mb-1">
-                <span className="text-sm font-bold text-slate-700 dark:text-slate-200 transition-colors">Solapur</span>
-                <span className="font-black text-sm" style={{ color: getStressColor(87) }}>87</span>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-200 transition-colors">{topRegion?.name ?? '—'}</span>
+                <span className="font-black text-sm" style={{ color: getStressColor(topRegion?.val ?? 0) }}>{topRegion?.val != null ? Math.round(topRegion.val) : '—'}</span>
               </div>
-              <div className="text-[10px] text-slate-500 mb-2 transition-colors">Source: <span className="text-slate-600 dark:text-slate-400">Mixed Sources</span></div>
+              <div className="text-[10px] text-slate-500 mb-2 transition-colors">Status: <span className="text-slate-600 dark:text-slate-400">{topRegion?.cat ?? '—'}</span></div>
               <div className="text-[10px] text-slate-600 dark:text-slate-400 bg-rose-50 dark:bg-rose-950/30 p-2 rounded border border-rose-200 dark:border-rose-900/20 transition-colors">
-                Stay indoors, keep windows closed
+                {topRegion ? 'High pollution — limit outdoor exposure' : 'Loading sensor data...'}
               </div>
             </div>
           </div>

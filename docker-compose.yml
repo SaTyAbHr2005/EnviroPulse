@@ -18,9 +18,8 @@ services:
       dockerfile: backend/Dockerfile
     container_name: enviropulse_backend
     restart: always
-    environment:
-      - DATABASE_URL=postgresql://postgres:Satya%402005@db:5432/enviropulse
-      - SECRET_KEY=${SECRET_KEY:-yoursecretkeyhere_for_jwt_later}
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     depends_on:

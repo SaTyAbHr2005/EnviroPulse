@@ -68,9 +68,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchAnalytics();
-    const intervalId = setInterval(fetchAnalytics, 5000); // 5s interval
-
-    return () => clearInterval(intervalId);
   }, []);
 
   // Helper for Stress color mapping (0-100 scale)
